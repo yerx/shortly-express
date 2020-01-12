@@ -93,20 +93,31 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
+app.post('/login', (req, res, next) => {
+  return models.Users.get(req.body)
+    .then((result) => {
+      if (models.Users.compare(req.body.password, result.password, result.salt)) {
+        res.redirect('/');
+      } else {
+        res.redirect('/login');
+      }
+    })
+    .catch(error => {
+      res.status(500).redirect('/login');
+    });
+});
+
 app.post('/signup', (req, res, next) => {
   // get the username and password
   // req.body
-  console.log('req.body', req.body);
-  models.Users.create(req.body)
-    .then((results) =>
-      console.log('app.post res: ', results))
+  // console.log('req.body', req.body);
+  return models.Users.create(req.body)
+    .then(() => {
+      res.status(200).redirect('/');
+    })
     .catch(error => {
-      res.render('signup', {
-        message: 'User already registered.',
-        messageClass: 'alert-danger'
-      });
+      res.status(500).redirect('/signup');
     });
-  // console.log('***error', error));
 });
 
 
